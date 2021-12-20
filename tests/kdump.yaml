@@ -1,0 +1,60 @@
+---
+- name: "get nova param"
+  hosts: localhost
+  connection: local
+  #  vars:
+  # param_value: 0
+
+  tasks:
+    - name: kdump service check
+      systemd:
+        name: kdump
+        state: started
+        # command: systemctl is-active kdump
+      register: output
+
+    - debug:
+        var: output.status.ActiveState
+#*********************kernel.nmi_watchdog********************* 
+
+    - name: Check for kernel.nmi_watchdog parameter
+      become: root
+      shell: "sysctl -a  | egrep kernel.nmi_watchdog.*"
+      register: output_kernel_nmi_watchdog
+      failed_when: "'kernel.nmi_watchdog = 0' in output_kernel_nmi_watchdog.stdout"
+
+    - debug:
+        msg: Current value set is "{{output_kernel_nmi_watchdog.stdout}}"
+
+#*********************kernel.panic_on_io_nmi********************* 
+
+    - name: Check for kernel.panic_on_io_nmi parameter
+      become: root
+      shell: "sysctl -a  | egrep kernel.panic_on_io_nmi.*"
+      register: output_kernel_panic_on_io_nmi
+      failed_when: "'kernel.panic_on_io_nmi = 0' in output_kernel_panic_on_io_nmi.stdout"
+
+    - debug:
+        msg: Current value set is "{{output_kernel_panic_on_io_nmi.stdout}}"
+
+#*********************kernel.panic_on_unrecovered_nmi********************* 
+
+    - name: Check for kernel.panic_on_unrecovered_nmi parameter
+      become: root
+      shell: "sysctl -a  | egrep kernel.panic_on_unrecovered_nmi.*"
+      register: output_kernel_panic_on_unrecovered_nmi
+      failed_when: "'kernel.panic_on_unrecovered_nmi = 0' in output_kernel_panic_on_unrecovered_nmi.stdout"
+
+    - debug:
+        msg: Current value set is "{{output_kernel_panic_on_unrecovered_nmi.stdout}}"
+
+#*********************kernel.unknown_nmi_panic*********************
+
+    - name: Check for kernel.unknown_nmi_panic parameter
+      become: root
+      shell: "sysctl -a  | egrep kernel.unknown_nmi_panic.*"
+      register: output_kernel_unknown_nmi_panic
+      failed_when: "'kernel.unknown_nmi_panic = 0' in output_kernel_unknown_nmi_panic.stdout"
+
+    - debug:
+        msg: Current value set is "{{output_kernel_unknown_nmi_panic.stdout}}"
